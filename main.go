@@ -1,20 +1,23 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"hash/fnv"
+)
 
 // MOD value for mod
-var MOD int = 6
+// var MOD int = 6
 
-func sumKey(str string) int {
-	byteArr := []byte(str)
+// func sumKey(str string) int {
+// 	byteArr := []byte(str)
 
-	sum := 0
-	for _, value := range byteArr {
-		sum += int(value)
-	}
+// 	sum := 0
+// 	for _, value := range byteArr {
+// 		sum += int(value)
+// 	}
 
-	return sum
-}
+// 	return sum
+// }
 
 func contains(slice []string, key string) bool {
 	for _, value := range slice {
@@ -69,13 +72,16 @@ var storageNodes = []StorageNode{
 	},
 }
 
-func hashFn(key string) int {
-	// Sum the bytes present in the key and take a mod with 6
-	return sumKey(key) % MOD
+func hashFn(key string, totalServers int) int {
+	hash := fnv.New32a()
+	hash.Write([]byte(key))
+	hashValue := hash.Sum32()
+
+	return int(hashValue) % totalServers
 }
 
 func uploadFn(path string) {
-	index := hashFn(path)
+	index := hashFn(path, len(storageNodes))
 	node := storageNodes[index]
 
 	node.putFile(path)
@@ -83,7 +89,7 @@ func uploadFn(path string) {
 }
 
 func fetchFn(path string) {
-	index := hashFn(path)
+	index := hashFn(path, len(storageNodes))
 	node := storageNodes[index]
 
 	if ok := node.fetchFile(path); !ok {
@@ -97,7 +103,7 @@ func fetchFn(path string) {
 func main() {
 	for true {
 		fmt.Println("Enter choice: ")
-		fmt.Printf("Put file: \t1\nFetch file:\t2\n")
+		fmt.Printf("Put file: \t1\nFetch file:\t2\nEnd program:\t3\n")
 
 		var choice int
 		fmt.Scanln(&choice)
@@ -115,6 +121,9 @@ func main() {
 			fmt.Scanln(&path)
 
 			fetchFn(path)
+		case 3:
+			fmt.Print("Ending the program!\n")
+			return
 		}
 	}
 }
