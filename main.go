@@ -7,15 +7,15 @@ import (
 	"sort"
 )
 
-func contains(arr []string, file string) bool {
-	for _, value := range arr {
-		if value == file {
-			return true
-		}
-	}
+// func contains(arr []string, file string) bool {
+// 	for _, value := range arr {
+// 		if value == file {
+// 			return true
+// 		}
+// 	}
 
-	return false
-}
+// 	return false
+// }
 
 func hashFn(key string, totalServers int) int {
 	hash := fnv.New32a()
